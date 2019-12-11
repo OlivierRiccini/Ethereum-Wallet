@@ -15,8 +15,8 @@ namespace Wallets
 {
     class EthereumWallet
     {
-        const string network = "wss://ropsten.infura.io/ws/v3/YOUR-PROJECT-ID"; // TODO: Specify wich network you are going to use.
-        const string workingDirectory = @"Wallets\"; // Path where you want to store the Wallets
+        const string network = "https://ropsten.infura.io/v3/0309a158d3d64f3786f1952ebb4812bc"; // TODO: Specify wich network you are going to use.
+        const string workingDirectory = @"Wallets"; // Path where you want to store the Wallets
 
         static void Main(string[] args)
         {
@@ -195,8 +195,9 @@ namespace Wallets
                 // Getting the Balance and Displaying the Information.
                 await Balance(web3, wallet);
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                WriteLine(e);
                 WriteLine("Error occured! Check your wallet.");
             }
         }
@@ -304,9 +305,9 @@ namespace Wallets
         {
             //TODO: Encrypt and Save the Wallet to JSON.
             string words = string.Join(" ", wallet.Words);
-            var encrypteWords = Rijndael.Encrypt(words, password, KeySize.Aes256);
+            var encryptedWords = Rijndael.Encrypt(words, password, KeySize.Aes256);
             string date = DateTime.Now.ToString();
-            var walletJsonData = new { encrypteWords = encrypteWords, date = date };
+            var walletJsonData = new { encryptedWords = encryptedWords, date = date };
             string json = JsonConvert.SerializeObject(walletJsonData);
             Random random = new Random();
             var fileName =
@@ -333,8 +334,8 @@ namespace Wallets
             {   
                 string line = File.ReadAllText(pathToFile);
                 dynamic results = JsonConvert.DeserializeObject<dynamic>(line);
-                string encrypteWords = results.encrypteWords;
-                words = Rijndael.Decrypt(encrypteWords, pass, KeySize.Aes256);
+                string encryptedWords = results.encryptedWords;
+                words = Rijndael.Decrypt(encryptedWords, pass, KeySize.Aes256);
                 string dataAndTime = results.date;
             }
             catch (Exception e)
